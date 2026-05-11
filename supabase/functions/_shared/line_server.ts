@@ -382,6 +382,28 @@ const createBookingHistoryFlex = (searchData, procedureData) => {
             "contents": [
               {
                 "type": "text",
+                "text": "姓名",
+                "color": "#aaaaaa",
+                "size": "sm",
+                "flex": 2
+              },
+              {
+                "type": "text",
+                "text": b.name,
+                "wrap": true,
+                "color": "#666666",
+                "size": "sm",
+                "flex": 5
+              }
+            ]
+          },
+          {
+            "type": "box",
+            "layout": "baseline",
+            "spacing": "sm",
+            "contents": [
+              {
+                "type": "text",
                 "text": "服務",
                 "color": "#aaaaaa",
                 "size": "sm",
