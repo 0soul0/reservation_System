@@ -31,9 +31,9 @@ import { formatDateTime } from "./tool.ts";
     const { accessToken, lineUid, responseText, searchData, payloadRequest } = replyData;
     if (!accessToken || !lineUid) return;
     console.log("payloadRequest", payloadRequest);
-    console.log("payloadReques222", (payloadRequest.flexType !== null && payloadRequest.flexType !== undefined));
+
     let messages;
-    if (payloadRequest.flexType !== null && payloadRequest.flexType !== undefined) {
+    if (payloadRequest && payloadRequest.flexType && payloadRequest.flexType !== null && payloadRequest.flexType !== undefined) {
       const flex = getFlexCancelBooking(payloadRequest)
       console.log("flex", flex);
       messages = [{
@@ -368,6 +368,28 @@ const createBookingHistoryFlex = (searchData, procedureData) => {
               {
                 "type": "text",
                 "text": showTime,
+                "wrap": true,
+                "color": "#666666",
+                "size": "sm",
+                "flex": 5
+              }
+            ]
+          },
+          {
+            "type": "box",
+            "layout": "baseline",
+            "spacing": "sm",
+            "contents": [
+              {
+                "type": "text",
+                "text": "姓名",
+                "color": "#aaaaaa",
+                "size": "sm",
+                "flex": 2
+              },
+              {
+                "type": "text",
+                "text": b.name,
                 "wrap": true,
                 "color": "#666666",
                 "size": "sm",
