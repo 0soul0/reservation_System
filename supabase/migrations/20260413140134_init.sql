@@ -594,6 +594,7 @@ BEGIN
         'booking_date', result.booking_date,
         'service_name', result.service_name,
         'status', result.status,
+        'name', result.name,
         'source_table', result.source_table,
         'created_at', result.created_at,
         'manager_uid', result.manager_uid -- (選填) 如果前端也需要知道這筆是哪個 manager 的
@@ -605,6 +606,7 @@ BEGIN
             b.booking_start_time AS booking_date, 
             b.service_item AS service_name,        
             b.status,
+            b.name,
             'current'::TEXT AS source_table,
             b.create_at AS created_at,
             b.manager_uid                     -- 這裡假設欄位名稱為 manager_uid
@@ -620,6 +622,7 @@ BEGIN
             bb.booking_start_time AS booking_date, 
             bb.service_item AS service_name,       
             bb.status,
+            bb.name,
             'backup'::TEXT AS source_table,
             bb.create_at AS created_at,
             bb.manager_uid                    -- 這裡假設欄位名稱為 manager_uid
