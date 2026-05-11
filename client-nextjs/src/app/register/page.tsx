@@ -47,7 +47,7 @@ function RegisterForm() {
     }
   }, [questionnaireStr])
 
-  const [answers, setAnswers] = useState<Record<string, string>>({})
+  const [answers, setAnswers] = useState<Record<string, string[]>>({})
   const [otherInputs, setOtherInputs] = useState<Record<string, string>>({})
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isAttempted, setIsAttempted] = useState(false)
@@ -63,9 +63,10 @@ function RegisterForm() {
     if (!parsedQuestionnaire || parsedQuestionnaire.length === 0) return true
     for (const q of parsedQuestionnaire) {
       const hasOptions = q.options && q.options.length > 0
+      const selected = answers[q.title] || []
       if (hasOptions) {
-        if (!answers[q.title]) return false
-        if (answers[q.title] === '__OTHER__' && !otherInputs[q.title]?.trim()) return false
+        if (selected.length === 0) return false
+        if (selected.includes('__OTHER__') && !otherInputs[q.title]?.trim()) return false
       } else {
         // 純文字題
         if (!otherInputs[q.title]?.trim()) return false
@@ -86,11 +87,18 @@ function RegisterForm() {
       const finalAnswers = parsedQuestionnaire.map((q: any) => {
         const hasOptions = q.options && q.options.length > 0
         let ans = ''
+        const selected = answers[q.title] || []
+        const otherVal = otherInputs[q.title]?.trim() || ''
+
         if (hasOptions) {
-          const raw = answers[q.title]
-          ans = raw === '__OTHER__' ? (otherInputs[q.title]?.trim() || '') : (raw || '')
+          if (q.type === 'multiple') {
+            const items = [...selected, ...(otherVal ? [otherVal] : [])]
+            ans = items.join(', ')
+          } else {
+            ans = selected.includes('__OTHER__') ? otherVal : (selected[0] || '')
+          }
         } else {
-          ans = otherInputs[q.title]?.trim() || ''
+          ans = otherVal
         }
         return { title: q.title, ans }
       })
@@ -194,9 +202,13 @@ function RegisterForm() {
 
               {parsedQuestionnaire.map((q: any, idx: number) => {
                 const hasOptions = q.options && q.options.length > 0
+                const selected = answers[q.title] || []
                 const isItemComplete = hasOptions
-                  ? (answers[q.title] && (answers[q.title] !== '__OTHER__' || otherInputs[q.title]?.trim()))
-                  : otherInputs[q.title]?.trim();
+                  ? (q.type === 'multiple' 
+                      ? (selected.length > 0 || otherInputs[q.title]?.trim())
+                      : (selected.includes('__OTHER__') ? !!otherInputs[q.title]?.trim() : selected.length > 0)
+                    )
+                  : !!otherInputs[q.title]?.trim();
 
                 return (
                   <div key={idx} className="space-y-2 animate-in fade-in slide-in-from-left-4 duration-500" style={{ animationDelay: `${idx * 150}ms` }}>
@@ -207,11 +219,22 @@ function RegisterForm() {
                     {hasOptions ? (
                       <div className="flex flex-wrap gap-2">
                         {q.options.map((opt: any, optIdx: number) => {
-                          const isSelected = answers[q.title] === opt.title
+                          const list = answers[q.title] || []
+                          const isSelected = list.includes(opt.title)
                           return (
                             <button
                               key={optIdx}
-                              onClick={() => setAnswers(prev => ({ ...prev, [q.title]: opt.title }))}
+                              onClick={() => {
+                                const isMultiple = q.type === 'multiple'
+                                setAnswers(prev => {
+                                  const current = prev[q.title] || []
+                                  if (isMultiple) {
+                                    return { ...prev, [q.title]: current.includes(opt.title) ? current.filter(i => i !== opt.title) : [...current, opt.title] }
+                                  } else {
+                                    return { ...prev, [q.title]: [opt.title] }
+                                  }
+                                })
+                              }}
                               className={`
                                 px-4 py-2 rounded-2xl text-ms font-black transition-all border-2
                                 ${isSelected ? 'bg-purple-600 border-purple-500 text-white shadow-lg shadow-purple-500/30' : 'bg-slate-100 border-transparent text-slate-600 hover:border-slate-200 hover:bg-slate-200/50'}
@@ -221,27 +244,32 @@ function RegisterForm() {
                             </button>
                           )
                         })}
-                        <button
-                          onClick={() => setAnswers(prev => ({ ...prev, [q.title]: '__OTHER__' }))}
-                          className={`
-                            px-4 py-2 rounded-2xl text-ms font-black transition-all border-2
-                            ${answers[q.title] === '__OTHER__' ? 'bg-purple-600 border-purple-500 text-white shadow-lg shadow-purple-500/30' : 'bg-slate-100 border-transparent text-slate-600 hover:border-slate-200 hover:bg-slate-200/50'}
-                          `}
-                        >
-                          其他
-                        </button>
+                        {/* 只有在單選模式下才顯示「其他」按鈕 */}
+                        {q.type !== 'multiple' && (
+                          <button
+                            onClick={() => {
+                              setAnswers(prev => ({ ...prev, [q.title]: ['__OTHER__'] }))
+                            }}
+                            className={`
+                              px-4 py-2 rounded-2xl text-ms font-black transition-all border-2
+                              ${(answers[q.title] || []).includes('__OTHER__') ? 'bg-purple-600 border-purple-500 text-white shadow-lg shadow-purple-500/30' : 'bg-slate-100 border-transparent text-slate-600 hover:border-slate-200 hover:bg-slate-200/50'}
+                            `}
+                          >
+                            其他
+                          </button>
+                        )}
                       </div>
                     ) : null}
 
-                    {/* Input for other or direct text questions */}
-                    {(answers[q.title] === '__OTHER__' || !hasOptions) && (
+                    {/* 多選模式或純文字題直接顯示輸入框，單選模式則需選中「其他」才顯示 */}
+                    {(q.type === 'multiple' || (answers[q.title] || []).includes('__OTHER__') || !hasOptions) && (
                       <div className="relative animate-in zoom-in-95 duration-300">
                         <input
                           type="text"
-                          placeholder="請輸入詳情..."
+                          placeholder={hasOptions ? "其他 (請輸入詳情...)" : "請輸入詳情..."}
                           value={otherInputs[q.title] || ''}
                           onChange={(e) => setOtherInputs(prev => ({ ...prev, [q.title]: e.target.value }))}
-                          className={`w-full bg-slate-100/50 border-2 rounded-2xl px-6 py-4 text-slate-900 font-bold outline-none transition-all shadow-inner ${isAttempted && answers[q.title] === '__OTHER__' && !otherInputs[q.title]?.trim() ? 'border-rose-400 bg-rose-50' : 'border-transparent focus:border-purple-500/20 focus:bg-white'}`}
+                          className={`w-full bg-slate-100/50 border-2 rounded-2xl px-6 py-4 text-slate-900 font-bold outline-none transition-all shadow-inner ${isAttempted && !isItemComplete ? 'border-rose-400 bg-rose-50' : 'border-transparent focus:border-purple-500/20 focus:bg-white'}`}
                         />
                       </div>
                     )}

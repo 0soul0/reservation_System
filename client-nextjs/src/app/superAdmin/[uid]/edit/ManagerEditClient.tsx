@@ -335,11 +335,16 @@ function QuestionnaireBuilder({
   value: QItem[]
   onChange: (v: QItem[]) => void
 }) {
-  const addQuestion = () => onChange([...value, { title: '', options: [] }])
+  const addQuestion = () => onChange([...value, { title: '', options: [], type: 'single' }])
   const removeQuestion = (idx: number) => onChange(value.filter((_, i) => i !== idx))
   const updateTitle = (idx: number, title: string) => {
     const next = [...value]
     next[idx] = { ...next[idx], title }
+    onChange(next)
+  }
+  const updateType = (idx: number, type: 'single' | 'multiple') => {
+    const next = [...value]
+    next[idx] = { ...next[idx], type }
     onChange(next)
   }
   const addOption = (qIdx: number) => {
@@ -376,6 +381,14 @@ function QuestionnaireBuilder({
               placeholder="題目標題"
               className="flex-1 bg-white/[0.04] border border-white/10 rounded-xl py-2 px-4 text-base text-white focus:outline-none focus:border-purple-500/40 transition-all font-bold"
             />
+            <select
+              value={q.type || 'single'}
+              onChange={(e) => updateType(qIdx, e.target.value as 'single' | 'multiple')}
+              className="bg-[#1a1a1a] border border-white/10 rounded-xl py-2 px-3 text-[13px] text-slate-300 focus:outline-none focus:border-purple-500/40 transition-all font-bold cursor-pointer"
+            >
+              <option value="single">單選</option>
+              <option value="multiple">多選</option>
+            </select>
             <button
               type="button"
               onClick={() => removeQuestion(qIdx)}

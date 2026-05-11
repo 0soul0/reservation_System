@@ -199,7 +199,8 @@ export type QOption = {
 }
 export type QItem = {
   title: string;
-  options: QOption[]
+  options: QOption[];
+  type?: 'single' | 'multiple';
 }
 
 // ─── Line Notify 問卷式填寫元件 ───────────────────────────────
