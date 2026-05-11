@@ -64,12 +64,14 @@ function RegisterForm() {
     for (const q of parsedQuestionnaire) {
       const hasOptions = q.options && q.options.length > 0
       const selected = answers[q.title] || []
+      const otherVal = otherInputs[q.title]?.trim()
+      
       if (hasOptions) {
-        if (selected.length === 0) return false
-        if (selected.includes('__OTHER__') && !otherInputs[q.title]?.trim()) return false
+        // 只要有選選項或是填寫其他，就算完成
+        if (selected.length === 0 && !otherVal) return false
       } else {
-        // 純文字題
-        if (!otherInputs[q.title]?.trim()) return false
+        // 純文字題，必須填寫
+        if (!otherVal) return false
       }
     }
     return true
@@ -85,22 +87,15 @@ function RegisterForm() {
     try {
       // Assemble answers formatted as [{title, ans}]
       const finalAnswers = parsedQuestionnaire.map((q: any) => {
-        const hasOptions = q.options && q.options.length > 0
-        let ans = ''
         const selected = answers[q.title] || []
         const otherVal = otherInputs[q.title]?.trim() || ''
-
-        if (hasOptions) {
-          if (q.type === 'multiple') {
-            const items = [...selected, ...(otherVal ? [otherVal] : [])]
-            ans = items.join(', ')
-          } else {
-            ans = selected.includes('__OTHER__') ? otherVal : (selected[0] || '')
-          }
-        } else {
-          ans = otherVal
-        }
-        return { title: q.title, ans }
+        
+        // 過濾掉內部的 __OTHER__ 標記（如果還有的話），並合併選中的選項與自定義輸入
+        const cleanSelected = selected.filter(s => s !== '__OTHER__')
+        const ansArr = [...cleanSelected]
+        if (otherVal) ansArr.push(otherVal)
+        
+        return { title: q.title, ans: ansArr.join(', ') }
       })
 
       const payload = {
@@ -204,10 +199,7 @@ function RegisterForm() {
                 const hasOptions = q.options && q.options.length > 0
                 const selected = answers[q.title] || []
                 const isItemComplete = hasOptions
-                  ? (q.type === 'multiple' 
-                      ? (selected.length > 0 || otherInputs[q.title]?.trim())
-                      : (selected.includes('__OTHER__') ? !!otherInputs[q.title]?.trim() : selected.length > 0)
-                    )
+                  ? (selected.length > 0 || !!otherInputs[q.title]?.trim())
                   : !!otherInputs[q.title]?.trim();
 
                 return (
@@ -216,8 +208,8 @@ function RegisterForm() {
                       {q.title} <span className="text-rose-500 font-bold">*</span>
                     </label>
 
-                    {hasOptions ? (
-                      <div className="flex flex-wrap gap-2">
+                    {hasOptions && (
+                      <div className="flex flex-wrap gap-2 mb-3">
                         {q.options.map((opt: any, optIdx: number) => {
                           const list = answers[q.title] || []
                           const isSelected = list.includes(opt.title)
@@ -244,35 +236,19 @@ function RegisterForm() {
                             </button>
                           )
                         })}
-                        {/* 只有在單選模式下才顯示「其他」按鈕 */}
-                        {q.type !== 'multiple' && (
-                          <button
-                            onClick={() => {
-                              setAnswers(prev => ({ ...prev, [q.title]: ['__OTHER__'] }))
-                            }}
-                            className={`
-                              px-4 py-2 rounded-2xl text-ms font-black transition-all border-2
-                              ${(answers[q.title] || []).includes('__OTHER__') ? 'bg-purple-600 border-purple-500 text-white shadow-lg shadow-purple-500/30' : 'bg-slate-100 border-transparent text-slate-600 hover:border-slate-200 hover:bg-slate-200/50'}
-                            `}
-                          >
-                            其他
-                          </button>
-                        )}
-                      </div>
-                    ) : null}
-
-                    {/* 多選模式或純文字題直接顯示輸入框，單選模式則需選中「其他」才顯示 */}
-                    {(q.type === 'multiple' || (answers[q.title] || []).includes('__OTHER__') || !hasOptions) && (
-                      <div className="relative animate-in zoom-in-95 duration-300">
-                        <input
-                          type="text"
-                          placeholder={hasOptions ? "其他 (請輸入詳情...)" : "請輸入詳情..."}
-                          value={otherInputs[q.title] || ''}
-                          onChange={(e) => setOtherInputs(prev => ({ ...prev, [q.title]: e.target.value }))}
-                          className={`w-full bg-slate-100/50 border-2 rounded-2xl px-6 py-4 text-slate-900 font-bold outline-none transition-all shadow-inner ${isAttempted && !isItemComplete ? 'border-rose-400 bg-rose-50' : 'border-transparent focus:border-purple-500/20 focus:bg-white'}`}
-                        />
                       </div>
                     )}
+
+                    {/* 直接顯示輸入框 */}
+                    <div className="relative animate-in zoom-in-95 duration-300">
+                      <input
+                        type="text"
+                        placeholder={hasOptions ? "其他 (請輸入詳情...)" : "請輸入詳情..."}
+                        value={otherInputs[q.title] || ''}
+                        onChange={(e) => setOtherInputs(prev => ({ ...prev, [q.title]: e.target.value }))}
+                        className={`w-full bg-slate-100/50 border-2 rounded-2xl px-6 py-4 text-slate-900 font-bold outline-none transition-all shadow-inner ${isAttempted && !isItemComplete ? 'border-rose-400 bg-rose-50' : 'border-transparent focus:border-purple-500/20 focus:bg-white'}`}
+                      />
+                    </div>
                     {isAttempted && !isItemComplete && (
                       <p className="text-[13px] text-rose-500 font-black ml-1 tracking-tighter">此項目為必填</p>
                     )}
