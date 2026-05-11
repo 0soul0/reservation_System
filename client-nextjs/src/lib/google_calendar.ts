@@ -4,8 +4,8 @@ import { CONFIG_ENV } from "./env";
 const GAS_URL = CONFIG_ENV.google.gasUrl;
 
 export const GOOGLE_CALENDAR_COLOR_ID = {
-    PURPLE: 3,
-    GRAY: 8,
+    BLUE_BERRY: 9, //已確認預約
+    PEACOCK: 7, //未確認預約
 }
 
 export class GoogleCalendarService {

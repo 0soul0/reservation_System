@@ -6,7 +6,7 @@ import { ROUTES } from '@/constants/routes'
 import { logoutAction } from '@/app/actions/superAuth'
 import { MANAGER_LEVEL } from '@/constants/common'
 import { Manager } from '@/types'
-
+import pkg from '../../../../package.json'
 
 export default function DashboardNav(session: Manager) {
   const [isOpen, setIsOpen] = useState(false)
@@ -31,7 +31,7 @@ export default function DashboardNav(session: Manager) {
 
       {/* Sidebar */}
       <aside className={`fixed inset-y-0 left-0 z-50 w-50 border-r border-white/10 flex flex-col backdrop-blur-xl bg-black/90 md:bg-white/5 md:relative transform transition-transform duration-300 ease-in-out font-bold ${isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}>
-        <div className="p-8 hidden md:block">
+        <div className="ps-8 pt-8 pb-1 hidden md:block">
           <Link href={ROUTES.ADMIN.MEMBERS} className="flex items-center gap-3 group">
             <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-cyan-500 rounded-lg flex items-center justify-center text-white group-hover:scale-110 transition-transform font-black shrink-0">
               <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
@@ -45,6 +45,11 @@ export default function DashboardNav(session: Manager) {
               </p>
             </div>
           </Link>
+        </div>
+        <div className="ps-8 pb-5 hidden md:block">
+          <p className="text-[14px] font-bold text-slate-300 tracking-widest uppercase">
+            v{pkg.version}
+          </p>
         </div>
 
         <nav className="flex-1 px-4 space-y-1 mt-4 md:mt-0">

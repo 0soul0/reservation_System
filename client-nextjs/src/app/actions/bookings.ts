@@ -52,7 +52,7 @@ export async function submitBooking(payload: any, maxCapacityArray: number[], ti
           service_computed_duration: payload.service_computed_duration,
           line_uid: payload.line_uid || result.line_uid,
           booking_uid: result.booking_uid,
-          color_id: GOOGLE_CALENDAR_COLOR_ID.GRAY.toString()
+          color_id: GOOGLE_CALENDAR_COLOR_ID.PEACOCK.toString()
         }
       });
       // (async () => {
@@ -199,7 +199,7 @@ export async function updateBookingStatus(booking: Booking, session: Manager, st
         googleCalendarId: result.data.google_calendar_id,
         eventId: result.data.google_calendar_event_id,
         data: {
-          color_id: status == BOOKING_STATUS.REVIEW ? GOOGLE_CALENDAR_COLOR_ID.GRAY.toString() : GOOGLE_CALENDAR_COLOR_ID.PURPLE.toString()
+          color_id: status == BOOKING_STATUS.REVIEW ? GOOGLE_CALENDAR_COLOR_ID.PEACOCK.toString() : GOOGLE_CALENDAR_COLOR_ID.BLUE_BERRY.toString()
         }
       }).catch(err => {
         console.error("背景同步日曆失敗:", err);
