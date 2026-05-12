@@ -51,7 +51,8 @@ const minutesToTime = (m: number) => {
 const SimpleCalendar: React.FC<{ selected: Date | null, onSelect: (d: Date) => void, limit: boolean }> = ({ selected, onSelect, limit }) => {
   const today = new Date()
   if (limit) {
-    today.setHours(48, 0, 0, 0)
+    today.setDate(today.getDate() + 3);
+    today.setHours(0, 0, 0, 0)
   } else {
     today.setHours(0, 0, 0, 0)
   }
