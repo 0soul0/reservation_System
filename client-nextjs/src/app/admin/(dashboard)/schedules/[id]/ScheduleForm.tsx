@@ -46,7 +46,7 @@ export default function ScheduleForm({ id, managerUid, initialData }: ScheduleFo
     schedule_menu_uid: isNew ? '' : id,
     time_range: '09:00-18:00',
     day_of_week: dow,
-    max_capacity: 2,
+    max_capacity: 1,
     is_open: true,
     is_open_last_booking_time: false,
     last_booking_time: '17:00',
@@ -578,7 +578,7 @@ export default function ScheduleForm({ id, managerUid, initialData }: ScheduleFo
                         name="capacity"
                         type="number"
                         min={1}
-                        defaultValue={editingOverride?.max_capacity || 2}
+                        defaultValue={editingOverride?.max_capacity || 1}
                         className="bg-transparent text-white font-black flex-1 focus:outline-none placeholder-slate-600"
                       />
                     </div>
