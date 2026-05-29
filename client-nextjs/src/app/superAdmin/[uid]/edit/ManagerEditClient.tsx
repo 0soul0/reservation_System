@@ -10,12 +10,12 @@ import {
 import {
   getAllManagers,
   upsertManager,
+  uploadLogo,
 } from '@/app/actions/superManagers'
 import { getSession } from '@/app/actions/superAuth'
 import { useSuperAdmin } from '../../SuperAdminContext'
 import { NotifyEntry, QItem } from '@/types'
 import { useAlert } from '@/components/ui/DialogProvider'
-import { supabaseAdmin } from '@/lib/supabase' // 引入供 Storage 使用
 import { hashPassword } from '@/lib/auth'
 import { ROUTES } from '@/constants/routes'
 import { MANAGER_LEVEL } from '@/constants/common'
@@ -611,23 +611,16 @@ export default function ManagerEditPage() {
       const formData = new FormData(e.currentTarget)
       const payload: any = Object.fromEntries(formData.entries())
 
-      // ─── 手動處理 Logo 上傳至 Supabase ──────────────────────────
       if (logoFile) {
-        const fileExt = logoFile.name.split('.').pop()
-        const fileName = `${Math.random().toString(36).substring(2)}.${fileExt}`
-        const filePath = `logos/${fileName}`
+        const uploadFormData = new FormData()
+        uploadFormData.append('file', logoFile)
 
-        const { error: uploadError } = await supabaseAdmin.storage
-          .from('logos')
-          .upload(filePath, logoFile)
+        const uploadRes = await uploadLogo(uploadFormData)
+        if (!uploadRes.success) {
+          throw new Error(uploadRes.message || 'Logo 上傳失敗')
+        }
 
-        if (uploadError) throw new Error(`Logo 上傳失敗: ${uploadError.message}`)
-
-        const { data: { publicUrl } } = supabaseAdmin.storage
-          .from('logos')
-          .getPublicUrl(filePath)
-
-        payload.logo_url = publicUrl
+        payload.logo_url = uploadRes.publicUrl
       } else {
         payload.logo_url = logoPreview // 保留原有的 URL
       }

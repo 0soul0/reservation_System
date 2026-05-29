@@ -82,3 +82,49 @@ export const getNotifyProcedures = unstable_cache(
     tags: ['line_notify_procedure']
   }
 )
+
+export async function uploadLogo(formData: FormData) {
+  try {
+    const file = formData.get('file') as File
+    if (!file) throw new Error('No file provided')
+
+    // Ensure the bucket exists
+    const { data: buckets, error: getBucketsError } = await supabaseAdmin.storage.listBuckets()
+    if (getBucketsError) throw getBucketsError
+
+    const hasLogosBucket = buckets?.some((b: any) => b.name === 'logos')
+    if (!hasLogosBucket) {
+      const { error: createBucketError } = await supabaseAdmin.storage.createBucket('logos', {
+        public: true,
+        fileSizeLimit: 5242880, // 5MB
+        allowedMimeTypes: ['image/*']
+      })
+      if (createBucketError) throw createBucketError
+    }
+
+    const fileExt = file.name.split('.').pop()
+    const fileName = `${Math.random().toString(36).substring(2)}.${fileExt}`
+    const filePath = `logos/${fileName}`
+
+    const arrayBuffer = await file.arrayBuffer()
+    const buffer = Buffer.from(arrayBuffer)
+
+    const { error: uploadError } = await supabaseAdmin.storage
+      .from('logos')
+      .upload(filePath, buffer, {
+        contentType: file.type,
+        duplex: 'half'
+      })
+
+    if (uploadError) throw uploadError
+
+    const { data: { publicUrl } } = supabaseAdmin.storage
+      .from('logos')
+      .getPublicUrl(filePath)
+
+    return { success: true, publicUrl }
+  } catch (err: any) {
+    console.error('uploadLogo error:', err)
+    return { success: false, message: err.message }
+  }
+}
