@@ -56,6 +56,7 @@ export type Booking = {
   status: number
   create_at: string
   update_at: string
+  note?: string
 }
 
 export interface BookingListProps {
@@ -156,6 +157,7 @@ export type BookingClientProps = {
   booking_cache: BookingCache[]
   line_uid: string | null
   limit: boolean
+  limitTime: boolean
 }
 
 
@@ -183,6 +185,7 @@ export type GasPayload = {
     line_uid?: string;
     booking_uid?: string;
     color_id?: string;
+    note?: string;
   };
 }
 

@@ -48,9 +48,9 @@ const minutesToTime = (m: number) => {
   return `${String(h).padStart(2, '0')}:${String(mm).padStart(2, '0')}`
 }
 
-const SimpleCalendar: React.FC<{ selected: Date | null, onSelect: (d: Date) => void, limit: boolean }> = ({ selected, onSelect, limit }) => {
+const SimpleCalendar: React.FC<{ selected: Date | null, onSelect: (d: Date) => void, limit: boolean, limitTime: boolean }> = ({ selected, onSelect, limit, limitTime }) => {
   const today = new Date()
-  if (limit) {
+  if (limit && !limitTime) {
     today.setDate(today.getDate() + 3);
     today.setHours(0, 0, 0, 0)
   } else {
@@ -116,7 +116,7 @@ const SimpleCalendar: React.FC<{ selected: Date | null, onSelect: (d: Date) => v
 export default function BookingClient(props: BookingClientProps) {
   const router = useRouter()
   const { showAlert } = useAlert()
-  const { is_member, manager, event, schedule, booking_cache, line_uid, limit } = props
+  const { is_member, manager, event, schedule, booking_cache, line_uid, limit, limitTime } = props
 
   // -- State --
   const [step, setStep] = useState(1)
@@ -126,6 +126,7 @@ export default function BookingClient(props: BookingClientProps) {
     email: '',
     line_uid: line_uid,
     selectedService: null as any,
+    note: '',
   })
   const [selectedDate, setSelectedDate] = useState<Date | null>(null)
   const [selectedTimeSlot, setSelectedTimeSlot] = useState<string | null>(null)
@@ -324,6 +325,7 @@ export default function BookingClient(props: BookingClientProps) {
       booking_end_time: TimeUtils.toUTC(endDateTime),
       service_computed_duration: duration,
       line_uid: formData.line_uid || '',
+      note: formData.note.trim()
     }
 
 
@@ -504,6 +506,18 @@ export default function BookingClient(props: BookingClientProps) {
                           )}
                         </div>
                       </div>
+
+                      {/* Note */}
+                      <div className="space-y-1.5">
+                        <label className="text-[14px] font-bold text-slate-500 ml-1">備註事項</label>
+                        <textarea
+                          value={formData.note}
+                          onChange={(e) => setFormData(p => ({ ...p, note: e.target.value }))}
+                          placeholder="若有其他特別需求或需要注意的事項，請在此填寫（選填）"
+                          rows={3}
+                          className="text-black w-full bg-slate-50 border-2 border-transparent rounded-2xl px-5 py-3.5 text-sm outline-none transition-all focus:border-purple-600/20 focus:bg-white resize-none"
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -532,7 +546,7 @@ export default function BookingClient(props: BookingClientProps) {
                   <h2 className="text-[14px] font-black text-slate-900 uppercase tracking-[0.2em] mb-6 flex items-center gap-2">
                     <CalendarIcon size={14} className="text-purple-600" /> 選擇日期
                   </h2>
-                  <SimpleCalendar selected={selectedDate} onSelect={setSelectedDate} limit={limit} />
+                  <SimpleCalendar selected={selectedDate} onSelect={setSelectedDate} limit={limit} limitTime={limitTime} />
                 </section>
 
                 {/* Times */}
@@ -628,6 +642,12 @@ export default function BookingClient(props: BookingClientProps) {
                       <span className="text-slate-500 font-bold text-xs">時段</span>
                       <span className="text-slate-800 font-black">{slotTime}</span>
                     </div>
+                    {formData.note && (
+                      <div className="flex flex-col gap-1 text-xm">
+                        <span className="text-slate-500 font-bold text-xs">備註事項</span>
+                        <span className="text-slate-800 font-black whitespace-pre-wrap">{formData.note}</span>
+                      </div>
+                    )}
                   </div>
                 </div>
 
