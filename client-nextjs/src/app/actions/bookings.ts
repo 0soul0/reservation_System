@@ -52,7 +52,8 @@ export async function submitBooking(payload: any, maxCapacityArray: number[], ti
           service_computed_duration: payload.service_computed_duration,
           line_uid: payload.line_uid || result.line_uid,
           booking_uid: result.booking_uid,
-          color_id: GOOGLE_CALENDAR_COLOR_ID.PEACOCK.toString()
+          color_id: GOOGLE_CALENDAR_COLOR_ID.PEACOCK.toString(),
+          note: payload.note || ''
         }
       });
       // (async () => {
@@ -99,7 +100,8 @@ export async function submitBooking(payload: any, maxCapacityArray: number[], ti
           service_computed_duration: payload.service_computed_duration,
           manager_uid: payload.manager_uid,
           action: LINE_NOTIFY_ACTION.BOOKING,
-          displayTime: `${payload.booking_start_time} - ${payload.booking_end_time.slice(-5)}`
+          displayTime: `${payload.booking_start_time} - ${payload.booking_end_time.slice(-5)}`,
+          note: payload.note || ''
         },
       })
     }

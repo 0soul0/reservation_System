@@ -56,6 +56,7 @@ export type Booking = {
   status: number
   create_at: string
   update_at: string
+  note?: string
 }
 
 export interface BookingListProps {
@@ -183,6 +184,7 @@ export type GasPayload = {
     line_uid?: string;
     booking_uid?: string;
     color_id?: string;
+    note?: string;
   };
 }
 

@@ -411,14 +411,14 @@ export default function BookingList({
                 </div>
               </div>
 
-              {/* {selectedBooking.notes && (
+              {selectedBooking.note && (
                 <div className="space-y-2 pt-2">
                   <p className="text-[14px] text-slate-400 uppercase font-black tracking-widest">備註事項</p>
                   <div className="p-4 bg-white/5 border border-white/10 rounded-3xl text-slate-200 text-xm leading-relaxed whitespace-pre-wrap font-bold">
-                    {selectedBooking.notes}
+                    {selectedBooking.note}
                   </div>
                 </div>
-              )} */}
+              )}
             </div>
 
             <div className="p-8 pt-0 flex gap-3">

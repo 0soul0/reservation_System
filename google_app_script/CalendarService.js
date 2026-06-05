@@ -17,7 +17,10 @@ const CalendarService = {
         const startTime = new Date(bookingData.booking_start_time);
         const endTime = new Date(bookingData.booking_end_time);
         const title = `預約: ${bookingData.name} - ${bookingData.service_item}`;
-        const description = `電話: ${bookingData.phone}\n`;
+        let description = `電話: ${bookingData.phone}\n`;
+        if (bookingData.note) {
+            description += `備註: ${bookingData.note}\n`;
+        }
 
         const event = calendar.createEvent(title, startTime, endTime, {
             description: description,
