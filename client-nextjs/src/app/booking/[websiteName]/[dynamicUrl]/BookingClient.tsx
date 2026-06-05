@@ -48,9 +48,9 @@ const minutesToTime = (m: number) => {
   return `${String(h).padStart(2, '0')}:${String(mm).padStart(2, '0')}`
 }
 
-const SimpleCalendar: React.FC<{ selected: Date | null, onSelect: (d: Date) => void, limit: boolean }> = ({ selected, onSelect, limit }) => {
+const SimpleCalendar: React.FC<{ selected: Date | null, onSelect: (d: Date) => void, limit: boolean, limitTime: boolean }> = ({ selected, onSelect, limit, limitTime }) => {
   const today = new Date()
-  if (limit) {
+  if (limit && !limitTime) {
     today.setDate(today.getDate() + 3);
     today.setHours(0, 0, 0, 0)
   } else {
@@ -116,7 +116,7 @@ const SimpleCalendar: React.FC<{ selected: Date | null, onSelect: (d: Date) => v
 export default function BookingClient(props: BookingClientProps) {
   const router = useRouter()
   const { showAlert } = useAlert()
-  const { is_member, manager, event, schedule, booking_cache, line_uid, limit } = props
+  const { is_member, manager, event, schedule, booking_cache, line_uid, limit, limitTime } = props
 
   // -- State --
   const [step, setStep] = useState(1)
@@ -546,7 +546,7 @@ export default function BookingClient(props: BookingClientProps) {
                   <h2 className="text-[14px] font-black text-slate-900 uppercase tracking-[0.2em] mb-6 flex items-center gap-2">
                     <CalendarIcon size={14} className="text-purple-600" /> 選擇日期
                   </h2>
-                  <SimpleCalendar selected={selectedDate} onSelect={setSelectedDate} limit={limit} />
+                  <SimpleCalendar selected={selectedDate} onSelect={setSelectedDate} limit={limit} limitTime={limitTime} />
                 </section>
 
                 {/* Times */}

@@ -10,12 +10,12 @@ import { Analytics } from "@vercel/analytics/next"
 
 type Props = {
   params: Promise<{ websiteName: string; dynamicUrl: string }>;
-  searchParams: Promise<{ schedule_menu_uid?: string; line_uid?: string; limit?: string }>;
+  searchParams: Promise<{ schedule_menu_uid?: string; line_uid?: string; limit?: string; limit_time?: string }>;
 };
 
 export default async function BookingPage({ params, searchParams }: Props) {
   const { websiteName, dynamicUrl } = await params
-  let { schedule_menu_uid, line_uid, limit } = await searchParams
+  let { schedule_menu_uid, line_uid, limit, limit_time } = await searchParams
 
 
   const data = await getBookingInfo(websiteName, dynamicUrl, schedule_menu_uid, line_uid)
@@ -46,7 +46,8 @@ export default async function BookingPage({ params, searchParams }: Props) {
     schedule: data.schedule,
     booking_cache: data.booking_cache,
     line_uid: line_uid || '',
-    limit: limit != "false"
+    limit: limit != "false",
+    limitTime: limit_time == "false"
   }
 
   return <><BookingClient {...info} /><Analytics /></>
