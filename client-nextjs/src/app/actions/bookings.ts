@@ -138,6 +138,11 @@ export async function cancelBooking(booking: Booking, session: Manager, timeSlot
     }
 
     if (booking.line_uid) {
+      let action = LINE_NOTIFY_ACTION.CANCEL
+      if (session.line_notify_content?.includes(LINE_NOTIFY_ACTION.APPLY_CANCELED) && booking.status === BOOKING_STATUS.APPLY_CANCELED) {
+        action = LINE_NOTIFY_ACTION.APPLY_CANCELED
+      }
+
       supabaseAdmin.functions.invoke(SUPABASE_EDGE_FUNCTION.lineBotNotify, {
         body: {
           name: booking.name,
@@ -146,8 +151,8 @@ export async function cancelBooking(booking: Booking, session: Manager, timeSlot
           booking_end_time: booking.booking_end_time,
           line_uid: booking.line_uid || result.line_uid,
           manager_uid: session.uid,
-          action: LINE_NOTIFY_ACTION.CANCEL,
-          flexType: BOOKING_STATUS.CANCELLED,
+          action: action,
+          flexType: booking.status === BOOKING_STATUS.APPLY_CANCELED ? 'APPLY_CANCELED' : 'CANCELLED',
           displayTime: `${booking.booking_start_time} - ${booking.booking_end_time.slice(-5)}`
         },
       })

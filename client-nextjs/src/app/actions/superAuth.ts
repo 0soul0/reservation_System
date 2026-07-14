@@ -32,8 +32,16 @@ export async function loginAction(formData: FormData, type: number) {
     return { success: false, message: '管理員密碼錯誤' }
   }
   user.password = ''
+
+  let line_notify_content = ''
+  if (user.line_notify_content !== null) {
+    const dataArray = JSON.parse(user.line_notify_content);
+    const keysArray: string[] = dataArray.map((item: any) => item.key);
+    line_notify_content = JSON.stringify(keysArray)
+  }
+
   const cookieStore = await cookies()
-  cookieStore.set(cacheKey(type), JSON.stringify({ uid: user.uid, account: user.account, website_name: user.website_name, logo_url: user.logo_url, google_calendar_id: user.google_calendar_id }), {
+  cookieStore.set(cacheKey(type), JSON.stringify({ line_notify_content: line_notify_content, uid: user.uid, account: user.account, website_name: user.website_name, logo_url: user.logo_url, google_calendar_id: user.google_calendar_id }), {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     maxAge: 60 * 60 * 24, // 1 day
