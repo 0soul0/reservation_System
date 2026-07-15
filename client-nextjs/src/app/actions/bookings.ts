@@ -152,7 +152,7 @@ export async function cancelBooking(booking: Booking, session: Manager, timeSlot
           line_uid: booking.line_uid || result.line_uid,
           manager_uid: session.uid,
           action: action,
-          flexType: booking.status === BOOKING_STATUS.APPLY_CANCELED ? 'APPLY_CANCELED' : 'CANCELLED',
+          flexType: action,
           displayTime: `${booking.booking_start_time} - ${booking.booking_end_time.slice(-5)}`
         },
       })
