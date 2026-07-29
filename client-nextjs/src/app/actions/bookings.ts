@@ -101,7 +101,8 @@ export async function submitBooking(payload: any, maxCapacityArray: number[], ti
           manager_uid: payload.manager_uid,
           action: LINE_NOTIFY_ACTION.BOOKING,
           displayTime: `${payload.booking_start_time} - ${payload.booking_end_time.slice(-5)}`,
-          note: payload.note || ''
+          note: payload.note || '',
+          booking_uid: result.booking_uid,
         },
       })
     }
