@@ -133,6 +133,7 @@ BEGIN
         options JSONB,
         booking_dynamic_url TEXT,
         website_name TEXT,
+        unit TEXT,
         create_at TIMESTAMPTZ DEFAULT NOW(),
         update_at TIMESTAMPTZ DEFAULT NOW()
     );

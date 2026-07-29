@@ -126,6 +126,7 @@ export type Event = {
   options: string // JSON object { name: string, items: { title: string, duration: number }[] }
   booking_dynamic_url: string | null
   website_name: string | null
+  unit: string
   create_at: string
   update_at: string
 }

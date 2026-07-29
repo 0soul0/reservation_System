@@ -21,6 +21,7 @@ export default function EventEditForm({ id, managerUid, managerWebsiteName, init
   // Form State
   const [title, setTitle] = useState(initialEvent?.title || '')
   const [description, setDescription] = useState(initialEvent?.description || '')
+  const [unit, setUnit] = useState(initialEvent?.unit || '')
   const [isPhoneRequired, setIsPhoneRequired] = useState(initialEvent?.is_phone_required ?? true)
   const [isEmailRequired, setIsEmailRequired] = useState(initialEvent?.is_email_required ?? false)
   const [bookingDynamicUrl, setBookingDynamicUrl] = useState(initialEvent?.booking_dynamic_url || '')
@@ -67,6 +68,7 @@ export default function EventEditForm({ id, managerUid, managerWebsiteName, init
       manager_uid: managerUid,
       title,
       description,
+      unit,
       is_phone_required: isPhoneRequired,
       is_email_required: isEmailRequired,
       booking_dynamic_url: bookingDynamicUrl,
@@ -131,15 +133,28 @@ export default function EventEditForm({ id, managerUid, managerWebsiteName, init
             </div>
 
             <div className="space-y-4">
-              <div className="group">
-                <label className="text-ms font-bold text-slate-300 uppercase mb-2 block">項目名稱</label>
-                <input
-                  type="text"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  placeholder="請輸入活動或服務標題..."
-                  className="w-full bg-white/5 border border-white/10 rounded-2xl px-2 py-1 text-xl font-bold text-white focus:border-purple-500/50 outline-none transition-all"
-                />
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div className="group md:col-span-3">
+                  <label className="text-ms font-bold text-slate-300 uppercase mb-2 block">項目名稱</label>
+                  <input
+                    type="text"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    placeholder="請輸入活動或服務標題..."
+                    className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-3 text-xl font-bold text-white focus:border-purple-500/50 outline-none transition-all"
+                  />
+                </div>
+
+                <div className="group md:col-span-1">
+                  <label className="text-ms font-bold text-slate-300 uppercase mb-2 block">單位</label>
+                  <input
+                    type="text"
+                    value={unit}
+                    onChange={(e) => setUnit(e.target.value)}
+                    placeholder="人、堂、組..."
+                    className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-3 text-xl font-bold text-white focus:border-purple-500/50 outline-none transition-all"
+                  />
+                </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

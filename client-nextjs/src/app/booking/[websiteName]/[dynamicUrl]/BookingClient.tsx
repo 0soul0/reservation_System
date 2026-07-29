@@ -566,7 +566,7 @@ export default function BookingClient(props: BookingClientProps) {
                           `}
                         >
                           <span className={`text-[14px] font-black ${selectedTimeSlot === slot.uid ? 'text-purple-600' : 'text-emerald-600'}`}>{slot.time_start}</span>
-                          <span className={`text-[14px] font-bold ${selectedTimeSlot === slot.uid ? 'text-purple-600' : 'text-slate-900'}`} >可預約 {slot.available_capacity} 位</span>
+                          <span className={`text-[14px] font-bold ${selectedTimeSlot === slot.uid ? 'text-purple-600' : 'text-slate-900'}`} >可預約 {slot.available_capacity} {event.unit || "位"}</span>
                         </button>
                       ))}
                       {getAvailableSlots(selectedDate).length === 0 && (
