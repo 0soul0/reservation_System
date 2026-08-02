@@ -503,8 +503,8 @@ export default function ScheduleForm({ id, managerUid, initialData }: ScheduleFo
       {/* Override Modal */}
 
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div onClick={() => setIsModalOpen(false)} className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+        <div className="fixed inset-0 z-50 flex items-start justify-center p-4 pt-10 md:pt-16 overflow-y-auto">
+          <div onClick={() => setIsModalOpen(false)} className="fixed inset-0 bg-black/60 backdrop-blur-sm" />
           <div
             className="bg-[#0a0a0a] border border-white/10 w-full max-w-lg rounded-[2.5rem] overflow-hidden shadow-2xl relative z-10 flex flex-col max-h-[90vh]"
           >
