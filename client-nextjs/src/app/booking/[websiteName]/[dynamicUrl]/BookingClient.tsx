@@ -18,6 +18,7 @@ import { useRouter } from 'next/navigation'
 import type { BookingClientProps, ScheduleSlotProps } from '@/types'
 import { useAlert } from '@/components/ui/DialogProvider'
 import { submitBooking } from '@/app/actions/bookings'
+import { checkMemberPhoneExists } from '@/app/actions/members'
 import { TIME_SLOT_INTERVAL } from '@/constants/common'
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc'
@@ -135,6 +136,8 @@ export default function BookingClient(props: BookingClientProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [slotTime, setSlotTime] = useState("")
   const [isLoaded, setIsLoaded] = useState(false)
+  const [isPhoneExist, setIsPhoneExist] = useState(false)
+  const [isCheckingPhone, setIsCheckingPhone] = useState(false)
 
   const bookingCacheSlotMap = new Map();
 
@@ -174,6 +177,32 @@ export default function BookingClient(props: BookingClientProps) {
     const cleanPhone = formData.phone.replace(/[- ]/g, '')
     return /^09\d{8}$/.test(cleanPhone)
   }, [formData.phone])
+
+  useEffect(() => {
+    let isCancelled = false
+    const cleanPhone = formData.phone.replace(/[- ]/g, '').trim()
+    if (cleanPhone.length >= 10 && event?.manager_uid) {
+      setIsCheckingPhone(true)
+      checkMemberPhoneExists(event.manager_uid, cleanPhone).then(exists => {
+        if (!isCancelled) {
+          setIsPhoneExist(exists)
+          setIsCheckingPhone(false)
+        }
+      }).catch(() => {
+        if (!isCancelled) {
+          setIsPhoneExist(false)
+          setIsCheckingPhone(false)
+        }
+      })
+    } else {
+      setIsPhoneExist(false)
+      setIsCheckingPhone(false)
+    }
+
+    return () => {
+      isCancelled = true
+    }
+  }, [formData.phone, event?.manager_uid])
 
   const isEmailValid = useMemo(() => {
     if (!formData.email) return true
@@ -441,10 +470,16 @@ export default function BookingClient(props: BookingClientProps) {
                               value={formData.phone}
                               onChange={(e) => setFormData(p => ({ ...p, phone: e.target.value }))}
                               placeholder="09XXXXXXXX"
-                              className={`text-black w-full bg-slate-50 border-2 rounded-2xl pl-12 pr-4 py-3.5 text-sm outline-none transition-all ${(isFirstStepAttempted && !formData.phone) || (formData.phone && !isPhoneValid) ? 'border-rose-200 bg-rose-50' : 'border-transparent focus:border-purple-600/20 focus:bg-white'}`}
+                              className={`text-black w-full bg-slate-50 border-2 rounded-2xl pl-12 pr-10 py-3.5 text-sm outline-none transition-all ${(isFirstStepAttempted && !formData.phone) || (formData.phone && !isPhoneValid) ? 'border-rose-200 bg-rose-50' : (formData.phone && isPhoneValid && formData.phone.replace(/[- ]/g, '').length >= 10 && !isPhoneExist && !isCheckingPhone) ? 'border-amber-300 bg-amber-50/40' : 'border-transparent focus:border-purple-600/20 focus:bg-white'}`}
                             />
+                            {isCheckingPhone && (
+                              <Loader2 size={16} className="absolute right-4 top-1/2 -translate-y-1/2 text-purple-600 animate-spin" />
+                            )}
                           </div>
                           {formData.phone && !isPhoneValid && <p className="text-[14px] text-rose-500 font-bold ml-1">格式不正確</p>}
+                          {formData.phone && isPhoneValid && formData.phone.replace(/[- ]/g, '').length >= 10 && !isPhoneExist && !isCheckingPhone && (
+                            <p className="text-[13px] text-amber-600 font-bold ml-1">此電話尚未登記會員，可能無法收到預約通知，但仍可正常預約</p>
+                          )}
                         </div>
                       )}
 

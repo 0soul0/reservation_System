@@ -85,3 +85,27 @@ export async function updateMember(payload: {
     return { success: false, message: err.message }
   }
 }
+
+export async function checkMemberPhoneExists(managerUid: string, phone: string) {
+  try {
+    const cleanPhone = phone.replace(/[- ]/g, '').trim()
+    if (!cleanPhone || !managerUid) return false
+
+    const { data, error } = await supabaseAdmin
+      .from('member')
+      .select('uid')
+      .eq('manager_uid', managerUid)
+      .eq('phone', cleanPhone)
+      .maybeSingle()
+
+    if (error) {
+      console.error('checkMemberPhoneExists Error:', error)
+      return false
+    }
+
+    return !!data
+  } catch (err) {
+    console.error('checkMemberPhoneExists Error:', err)
+    return false
+  }
+}
