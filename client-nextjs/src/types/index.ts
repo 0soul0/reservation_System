@@ -127,6 +127,7 @@ export type Event = {
   booking_dynamic_url: string | null
   website_name: string | null
   unit: string
+  futureDaysInterval: number | null
   create_at: string
   update_at: string
 }

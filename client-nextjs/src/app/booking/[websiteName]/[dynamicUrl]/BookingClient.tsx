@@ -49,15 +49,20 @@ const minutesToTime = (m: number) => {
   return `${String(h).padStart(2, '0')}:${String(mm).padStart(2, '0')}`
 }
 
-const SimpleCalendar: React.FC<{ selected: Date | null, onSelect: (d: Date) => void, limit: boolean, limitTime: boolean }> = ({ selected, onSelect, limit, limitTime }) => {
+const SimpleCalendar: React.FC<{ selected: Date | null, onSelect: (d: Date) => void, limit: boolean, limitTime: boolean, futureDaysInterval?: number | null }> = ({ selected, onSelect, limit, limitTime, futureDaysInterval }) => {
   const today = new Date()
+  let maxDate: Date | null = null;
   if (limit && !limitTime) {
     today.setDate(today.getDate() + 3);
     today.setHours(0, 0, 0, 0)
+
+    if (futureDaysInterval != null) {
+      maxDate = new Date(today);
+      maxDate.setDate(today.getDate() + futureDaysInterval);
+    }
   } else {
     today.setHours(0, 0, 0, 0)
   }
-
 
   const [viewDate, setViewDate] = useState(new Date(selected || today))
 
@@ -93,15 +98,17 @@ const SimpleCalendar: React.FC<{ selected: Date | null, onSelect: (d: Date) => v
           const isSelected = selected && d.getTime() === selected.getTime()
           const isToday = d.getTime() === today.getTime()
           const isPast = d < today
+          const isTooFarFuture = maxDate ? d > maxDate : false
+          const isDisabled = isPast || isTooFarFuture
 
           return (
             <div
               key={date.toISOString()}
-              onClick={() => !isPast && onSelect(new Date(date))}
+              onClick={() => !isDisabled && onSelect(new Date(date))}
               className={`
                 relative py-2.5 rounded-xl text-xm font-bold transition-all
-                ${isPast ? 'text-slate-200 cursor-not-allowed' : 'cursor-pointer'}
-                ${isSelected ? 'bg-gradient-to-br from-purple-600 to-cyan-600 text-white shadow-lg shadow-purple-500/20' : isToday && !isPast ? 'text-purple-600 hover:bg-purple-50' : !isPast ? 'text-slate-600 hover:bg-slate-50' : ''}
+                ${isDisabled ? 'text-slate-200 cursor-not-allowed' : 'cursor-pointer'}
+                ${isSelected ? 'bg-gradient-to-br from-purple-600 to-cyan-600 text-white shadow-lg shadow-purple-500/20' : isToday && !isDisabled ? 'text-purple-600 hover:bg-purple-50' : !isDisabled ? 'text-slate-600 hover:bg-slate-50' : ''}
               `}
             >
               {date.getDate()}
@@ -581,7 +588,7 @@ export default function BookingClient(props: BookingClientProps) {
                   <h2 className="text-[14px] font-black text-slate-900 uppercase tracking-[0.2em] mb-6 flex items-center gap-2">
                     <CalendarIcon size={14} className="text-purple-600" /> 選擇日期
                   </h2>
-                  <SimpleCalendar selected={selectedDate} onSelect={setSelectedDate} limit={limit} limitTime={limitTime} />
+                  <SimpleCalendar selected={selectedDate} onSelect={setSelectedDate} limit={limit} limitTime={limitTime} futureDaysInterval={event.futureDaysInterval} />
                 </section>
 
                 {/* Times */}

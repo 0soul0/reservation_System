@@ -26,6 +26,7 @@ export default function EventEditForm({ id, managerUid, managerWebsiteName, init
   const [isEmailRequired, setIsEmailRequired] = useState(initialEvent?.is_email_required ?? false)
   const [bookingDynamicUrl, setBookingDynamicUrl] = useState(initialEvent?.booking_dynamic_url || '')
   const [lineLiffId, setLineLiffId] = useState(initialEvent?.line_liff_id || '')
+  const [futureDaysInterval, setFutureDaysInterval] = useState<number | ''>(initialEvent?.futureDaysInterval ?? '')
 
   const [options, setOptions] = useState(() => {
     try {
@@ -75,7 +76,8 @@ export default function EventEditForm({ id, managerUid, managerWebsiteName, init
       line_liff_id: lineLiffId,
       website_name: managerWebsiteName,
       options: JSON.stringify(options),
-      schedule_menu_uid: JSON.stringify(selectedMenus)
+      schedule_menu_uid: JSON.stringify(selectedMenus),
+      futureDaysInterval: futureDaysInterval === '' ? null : Number(futureDaysInterval)
     }
 
     const res = await saveEvent(payload)
@@ -180,6 +182,20 @@ export default function EventEditForm({ id, managerUid, managerWebsiteName, init
                       value={lineLiffId}
                       onChange={(e) => setLineLiffId(e.target.value)}
                       placeholder="例如: 2000000000-XXXXXXXX"
+                      className="w-full bg-transparent text-white font-mono text-xm outline-none"
+                    />
+                  </div>
+                </div>
+                
+                <div className="group">
+                  <label className="text-ms font-bold text-slate-300 uppercase mb-2 block">開放預約天數限制 (天)</label>
+                  <div className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-2xl px-4 py-3 group-focus-within:border-cyan-500/50 transition-all">
+                    <input
+                      type="number"
+                      value={futureDaysInterval}
+                      onChange={(e) => setFutureDaysInterval(e.target.value === '' ? '' : Number(e.target.value))}
+                      placeholder="例如: 30"
+                      min="1"
                       className="w-full bg-transparent text-white font-mono text-xm outline-none"
                     />
                   </div>
