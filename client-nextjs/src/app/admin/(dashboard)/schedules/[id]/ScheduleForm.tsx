@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { useRouter } from 'next/navigation'
 
 import {
@@ -440,7 +441,7 @@ export default function ScheduleForm({ id, managerUid, initialData }: ScheduleFo
               </button>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-4 max-h-[800px] overflow-y-auto pr-2">
               {overrides.length === 0 ? (
                 <div className="p-10 text-center bg-white/5 border border-dashed border-white/10 rounded-[1.5rem] text-slate-300 text-xm font-medium">
                   目前尚無特別日期設定
@@ -502,8 +503,8 @@ export default function ScheduleForm({ id, managerUid, initialData }: ScheduleFo
 
       {/* Override Modal */}
 
-      {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-start justify-center p-4 pt-10 md:pt-16 overflow-y-auto">
+      {isModalOpen && typeof document !== 'undefined' && createPortal(
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
           <div onClick={() => setIsModalOpen(false)} className="fixed inset-0 bg-black/60 backdrop-blur-sm" />
           <div
             className="bg-[#0a0a0a] border border-white/10 w-full max-w-lg rounded-[2.5rem] overflow-hidden shadow-2xl relative z-10 flex flex-col max-h-[90vh]"
@@ -606,7 +607,7 @@ export default function ScheduleForm({ id, managerUid, initialData }: ScheduleFo
             </form>
           </div>
         </div>
-      )}
+        , document.body)}
     </div >
   )
 }
