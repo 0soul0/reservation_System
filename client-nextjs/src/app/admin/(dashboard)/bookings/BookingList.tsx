@@ -230,7 +230,7 @@ export default function BookingList({
                     </div>
                   </td>
                   <td className="px-4 py-3 whitespace-nowrap">
-                    <div className="font-bold text-white text-[15px]">{booking.name}</div>
+                    <div className="font-bold text-white text-[15px] notranslate">{booking.name}</div>
                     <div className="text-[13px] text-slate-400 mt-1 font-mono font-bold tracking-wider">{booking.phone}</div>
                   </td>
                   <td className="px-4 py-3">
@@ -371,7 +371,7 @@ export default function BookingList({
 
             <div className="p-6 md:p-8 overflow-y-auto flex-1 space-y-6 no-scrollbar">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                <InfoItem icon={<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-cyan-400"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>} label="預約人" value={selectedBooking.name} />
+                <InfoItem icon={<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-cyan-400"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>} label="預約人" value={selectedBooking.name} notranslate />
                 <InfoItem icon={<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-purple-400"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>} label="手機電話" value={selectedBooking.phone} />
                 <div className="col-span-1  sm:col-span-2">
                   <InfoItem icon={<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-emerald-400"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7" y2="7"></line></svg>} label="服務項目" value={selectedBooking.service_item} />
@@ -467,14 +467,14 @@ function Switch({ checked, onChange }: { checked: boolean; onChange: () => void 
   )
 }
 
-function InfoItem({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
+function InfoItem({ icon, label, value, notranslate }: { icon: React.ReactNode; label: string; value: string; notranslate?: boolean }) {
   return (
     <div className="space-y-1">
       <div className="flex items-center gap-2 text-slate-300 text-ms uppercase font-mono font-bold">
         {icon}
         <span>{label}</span>
       </div>
-      <p className="text-white font-bold pl-6">{value}</p>
+      <p className={`text-white font-bold pl-6 ${notranslate ? 'notranslate' : ''}`} translate={notranslate ? 'no' : undefined}>{value}</p>
     </div>
   )
 }

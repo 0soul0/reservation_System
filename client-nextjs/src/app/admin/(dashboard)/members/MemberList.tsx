@@ -174,7 +174,7 @@ export default function MemberList({
                   onClick={() => openMemberDetail(member)}
                   className="hover:bg-white/10 transition-colors group cursor-pointer"
                 >
-                  <td className="px-4 py-3 text-white whitespace-nowrap tracking-tight">{member.name || '未命名'}</td>
+                  <td className="px-4 py-3 text-white whitespace-nowrap tracking-tight notranslate">{member.name || '未命名'}</td>
                   <td className="px-4 py-3">
                     <div className="space-y-1.5 font-bold">
                       <div className="flex items-center gap-2 text-xm text-slate-200">
@@ -309,7 +309,7 @@ export default function MemberList({
                 <div className="space-y-1">
                   <div className="flex items-center gap-2 text-slate-300 text-ms font-bold tracking-tight">
                     <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-purple-400"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
-                    <span>Email</span>
+                    <span>電子郵件</span>
                   </div>
                   <input
                     type="email"
