@@ -13,6 +13,7 @@ import { useAlert } from '@/components/ui/DialogProvider'
 import { nanoid } from 'nanoid'
 import { TimeUtils } from '@/lib/TimeUtils'
 import { ROUTES } from '@/constants/routes'
+import { Switch } from '@/components/ui/switch'
 
 
 const DAY_LABELS = ['週一', '週二', '週三', '週四', '週五', '週六', '週日']
@@ -333,12 +334,13 @@ export default function ScheduleForm({ id, managerUid, initialData }: ScheduleFo
                     {/* Header */}
                     <div className="p-5 md:p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                       <div className="flex items-center gap-4 md:gap-6 w-full sm:w-auto">
-                        <button
-                          onClick={() => toggleDay(dow, enabled)}
-                          className={`relative w-11 h-6 rounded-full transition-all duration-300 outline-none flex items-center ${enabled ? 'bg-purple-600' : 'bg-slate-700'}`}
-                        >
-                          <div className="w-4 h-4 bg-white rounded-full shadow-lg" />
-                        </button>
+
+                        <Switch
+                          checked={enabled}
+                          onCheckedChange={() => toggleDay(dow, enabled)}
+                          className="data-[checked]:bg-purple-600 data-[unchecked]:bg-slate-700 dark:data-[unchecked]:bg-slate-700"
+                        />
+
                         <div className="flex flex-wrap items-center gap-3 md:gap-4">
                           <span className={`text-lg font-black transition-colors ${enabled ? 'text-white' : 'text-slate-300'}`}>{label}</span>
 
@@ -346,12 +348,18 @@ export default function ScheduleForm({ id, managerUid, initialData }: ScheduleFo
                           {enabled && (
                             <div className="flex items-center gap-2 bg-white/10 border border-white/10 px-3 py-1.5 rounded-xl shadow-inner">
                               <span className="text-[14px] font-black text-slate-400 uppercase tracking-tighter">最後預約</span>
-                              <button
-                                onClick={() => updateDayLastBooking(dow, { is_open_last_booking_time: !firstSlot.is_open_last_booking_time })}
-                                className={`w-7 h-4 rounded-full transition-all relative flex items-center ${firstSlot.is_open_last_booking_time ? 'bg-cyan-600' : 'bg-slate-800'}`}
-                              >
-                                <div className="w-2.5 h-2.5 bg-white rounded-full shadow-sm" />
-                              </button>
+
+                              <Switch
+                                checked={!!firstSlot.is_open_last_booking_time}
+                                onCheckedChange={() =>
+                                  updateDayLastBooking(dow, {
+                                    is_open_last_booking_time: !firstSlot.is_open_last_booking_time,
+                                  })
+                                }
+                                size="sm"
+                                className="data-[checked]:bg-cyan-600 data-[unchecked]:bg-slate-800 dark:data-[unchecked]:bg-slate-800"
+                              />
+
                               <select
                                 disabled={!firstSlot.is_open_last_booking_time}
                                 value={firstSlot.last_booking_time}
@@ -528,9 +536,9 @@ export default function ScheduleForm({ id, managerUid, initialData }: ScheduleFo
                 <button
                   type="button"
                   onClick={() => setTempIsClosed(!tempIsClosed)}
-                  className={`relative w-12 h-6 rounded-full transition-all duration-300 outline-none flex items-center ${tempIsClosed ? 'bg-rose-600 shadow-lg shadow-rose-500/20' : 'bg-slate-700'}`}
+                  className={`relative w-12 h-6 rounded-full transition-all duration-300 outline-none flex items-center px-1 ${tempIsClosed ? 'bg-rose-600 shadow-lg shadow-rose-500/20' : 'bg-slate-700'}`}
                 >
-                  <div style={{ x: tempIsClosed ? 26 : 4 }} className="w-4 h-4 bg-white rounded-full shadow-md" />
+                  <div className={`w-4 h-4 bg-white rounded-full shadow-md transition-transform duration-300 ${tempIsClosed ? 'translate-x-6' : 'translate-x-0'}`} />
                 </button>
               </div>
 
