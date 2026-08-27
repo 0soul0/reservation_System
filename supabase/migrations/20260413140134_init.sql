@@ -368,6 +368,12 @@ DECLARE
     v_new_booking_uid TEXT;
     v_google_token TEXT;
     v_line_token TEXT;
+    
+    -- 新增寫入欄位變數
+    v_status INTEGER;
+    v_is_deposit_received BOOLEAN;
+    v_is_reminded_3d BOOLEAN;
+    v_is_reminded_1d BOOLEAN;
 BEGIN
     -- 1. 解析基本資料
     v_manager_uid := p_booking_data->>'manager_uid';
@@ -376,6 +382,12 @@ BEGIN
     v_start_time := (p_booking_data->>'booking_start_time')::TIMESTAMPTZ;
     v_end_time := (p_booking_data->>'booking_end_time')::TIMESTAMPTZ;
     v_new_booking_uid := COALESCE(p_booking_data->>'uid', nanoid(8));
+
+    -- 解析新增或可預設欄位 (若 JSONB 未傳入則套用系統預設值)
+    v_status := COALESCE((p_booking_data->>'status')::INTEGER, 1);
+    v_is_deposit_received := COALESCE((p_booking_data->>'is_deposit_received')::BOOLEAN, false);
+    v_is_reminded_3d := COALESCE((p_booking_data->>'is_reminded_3d')::BOOLEAN, false);
+    v_is_reminded_1d := COALESCE((p_booking_data->>'is_reminded_1d')::BOOLEAN, false);
 
     -- 【自動補完邏輯】如果 line_uid 是空的，根據 phone 查詢 member table
     IF (v_line_uid IS NULL OR v_line_uid = '') AND v_phone IS NOT NULL THEN
@@ -395,8 +407,6 @@ BEGIN
     -- 3. 迴圈檢查各時段容量
     v_current_slot := v_start_time;
     WHILE v_current_slot < v_end_time LOOP
-        -- 修正：如果陣列索引超出範圍，預設使用最後一個容量設定或預設 1
-        -- 這裡維持你的原邏輯，但請確保 p_max_capacity_array 長度足夠
         SELECT booked_count INTO v_booked_count 
         FROM public.booking_cache
         WHERE manager_uid = v_manager_uid AND booking_start_time = v_current_slot;
@@ -409,17 +419,43 @@ BEGIN
         v_idx := v_idx + 1;
     END LOOP;
 
-    -- 4. 執行實際預約單插入 (新增 status 欄位)
+    -- 4. 執行實際預約單插入 (包含全欄位對應)
     INSERT INTO public.booking (
-        uid, manager_uid, name, line_uid, phone, 
-        booking_start_time, booking_end_time, 
-        service_item, service_computed_duration,
-        status -- <--- 新增欄位
+        uid, 
+        manager_uid, 
+        name, 
+        line_uid, 
+        phone, 
+        google_calendar_event_id,
+        booking_start_time, 
+        booking_end_time, 
+        service_item, 
+        service_computed_duration,
+        is_deposit_received,
+        status,
+        is_reminded_3d,
+        is_reminded_1d,
+        note,
+        create_at,
+        update_at
     ) VALUES (
-        v_new_booking_uid, v_manager_uid, p_booking_data->>'name', v_line_uid, v_phone, 
-        v_start_time, v_end_time, p_booking_data->>'service_item', 
+        v_new_booking_uid, 
+        v_manager_uid, 
+        p_booking_data->>'name', 
+        v_line_uid, 
+        v_phone, 
+        p_booking_data->>'google_calendar_event_id',
+        v_start_time, 
+        v_end_time, 
+        p_booking_data->>'service_item', 
         (p_booking_data->>'service_computed_duration')::INTEGER,
-        10 -- <--- 預設狀態設為 10 (預約中)
+        v_is_deposit_received,
+        v_status,
+        v_is_reminded_3d,
+        v_is_reminded_1d,
+        p_booking_data->>'note',
+        NOW(),
+        NOW()
     );
 
     -- 5. 更新快取表 (booking_cache) 的預約人數
@@ -444,7 +480,7 @@ BEGIN
         'booking_success', true, 
         'msg', '預約成功', 
         'booking_uid', v_new_booking_uid,
-        'status', 10, -- 回傳當前狀態
+        'status', v_status,
         'line_uid', NULLIF(v_line_uid, ''), 
         'google_calendar_id', NULLIF(v_google_token, ''),
         'line_channel_access_token', NULLIF(v_line_token, '')
