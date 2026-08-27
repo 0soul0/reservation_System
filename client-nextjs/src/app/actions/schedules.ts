@@ -5,7 +5,13 @@ import { revalidatePath } from 'next/cache'
 import { ROUTES, PATH_PATTERNS } from '@/constants/routes'
 
 export async function saveScheduleConfig(payload: {
-  menu: { uid: string; manager_uid: string; name: string },
+  menu: {
+    uid: string
+    manager_uid: string
+    name: string
+    is_auto_delete_expired?: boolean
+    auto_delete_days?: number
+  },
   times: any[]
 }) {
   try {
@@ -64,6 +70,8 @@ export async function createScheduleMenu(managerUid: string) {
         uid,
         manager_uid: managerUid,
         name: '未命名模板',
+        is_auto_delete_expired: true,
+        auto_delete_days: 7,
         create_at: new Date().toISOString(),
         update_at: new Date().toISOString()
       })

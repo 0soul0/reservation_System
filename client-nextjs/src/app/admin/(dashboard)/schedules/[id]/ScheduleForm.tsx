@@ -32,6 +32,8 @@ export default function ScheduleForm({ id, managerUid, initialData }: ScheduleFo
 
   // Form State
   const [name, setName] = useState(initialData.menu?.name || '')
+  const [isAutoDeleteExpired, setIsAutoDeleteExpired] = useState<boolean>(initialData.menu?.is_auto_delete_expired ?? true)
+  const [autoDeleteDays, setAutoDeleteDays] = useState<number>(initialData.menu?.auto_delete_days ?? 7)
   const [times, setTimes] = useState<ScheduleTime[]>(initialData.times)
   const [overrides, setOverrides] = useState<ScheduleOverride[]>(initialData.overrides)
 
@@ -89,6 +91,9 @@ export default function ScheduleForm({ id, managerUid, initialData }: ScheduleFo
   const handleSave = async () => {
     // 檢查是否有實質變動 (Dirty Check)
     const isNameChanged = name !== (initialData.menu?.name || '')
+    const isAutoDeleteChanged =
+      isAutoDeleteExpired !== (initialData.menu?.is_auto_delete_expired ?? true) ||
+      autoDeleteDays !== (initialData.menu?.auto_delete_days ?? 7)
     const isTimesLengthChanged = times.length !== initialData.times.length
 
     let isTimesDirty = isTimesLengthChanged
@@ -108,7 +113,7 @@ export default function ScheduleForm({ id, managerUid, initialData }: ScheduleFo
       }
     }
 
-    const isDirty = isNameChanged || isTimesDirty || isNew
+    const isDirty = isNameChanged || isAutoDeleteChanged || isTimesDirty || isNew
 
     if (!isDirty) {
       router.push(ROUTES.ADMIN.SCHEDULES)
@@ -131,7 +136,9 @@ export default function ScheduleForm({ id, managerUid, initialData }: ScheduleFo
       menu: {
         uid: targetMenuUid,
         manager_uid: managerUid,
-        name: name || '未命名模板'
+        name: name || '未命名模板',
+        is_auto_delete_expired: isAutoDeleteExpired,
+        auto_delete_days: autoDeleteDays
       },
       times: timesToUpsert
     }
@@ -447,6 +454,37 @@ export default function ScheduleForm({ id, managerUid, initialData }: ScheduleFo
               >
                 <Plus size={20} />
               </button>
+            </div>
+
+            {/* 自動刪除過期特別日期設定 */}
+            <div className="mb-6 p-4 bg-white/5 border border-white/10 rounded-2xl space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Trash2 size={16} className="text-purple-400" />
+                  <span className="text-xs font-bold text-slate-200">自動刪除過期日期</span>
+                </div>
+                <Switch
+                  checked={isAutoDeleteExpired}
+                  onCheckedChange={setIsAutoDeleteExpired}
+                  className="data-[checked]:bg-purple-600 data-[unchecked]:bg-slate-700 dark:data-[unchecked]:bg-slate-700"
+                />
+              </div>
+              {isAutoDeleteExpired && (
+                <div className="flex items-center justify-between pt-2 border-t border-white/5 text-xs text-slate-400 font-bold">
+                  <span>保留天數</span>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="number"
+                      min={1}
+                      max={365}
+                      value={autoDeleteDays}
+                      onChange={(e) => setAutoDeleteDays(Math.max(1, Number(e.target.value)))}
+                      className="w-16 bg-white/10 border border-white/10 rounded-lg px-2 py-1 text-center text-white font-mono font-bold focus:outline-none focus:border-purple-500"
+                    />
+                    <span>天後清理</span>
+                  </div>
+                </div>
+              )}
             </div>
 
             <div className="space-y-4 max-h-[800px] overflow-y-auto pr-2">

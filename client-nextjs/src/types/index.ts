@@ -73,6 +73,8 @@ export type ScheduleMenu = {
   uid: string
   manager_uid: string
   name: string
+  is_auto_delete_expired?: boolean
+  auto_delete_days?: number
   create_at: string
   update_at: string
 }
